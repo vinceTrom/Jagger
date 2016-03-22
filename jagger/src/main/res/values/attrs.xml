@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="participantView">
+        <attr name="textColor" format="reference|color" />
+        <attr name="textSize" format="reference|dimension" />
+        <attr name="circleSize" format="reference|dimension" />
+        <attr name="borderSize" format="reference|dimension" />
+        <attr name="bold" format="boolean" />
+        <attr name="orangebackground" format="boolean" />
+        <attr name="nameMargin" format="reference|dimension" />
+    </declare-styleable>
+
+</resources>
