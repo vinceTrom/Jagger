@@ -139,14 +139,14 @@ public class ChatFragment extends Fragment {
             @Override
             public void connectedAndLogged() {
                 removeLoaderView();
-                Toast.makeText(getActivity(), "connected And Logged", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.connection_and_logged, Toast.LENGTH_SHORT).show();
             }
         });
         mXmppService.setMessageReceiver(new XMPPOnMessageReceivedListener() {
 
             @Override
             public void messageReceived(XMPPMessage message) {
-                Toast.makeText(getActivity(), "messageReceived:" + message.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.message_received + message.getMessage(), Toast.LENGTH_SHORT).show();
 
                 mMessages.add(message);
                 addMessageToList(message);
@@ -240,7 +240,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void messageSent(XMPPMessage pMessage) {
-                Toast.makeText(getActivity(), "Message envoyé", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.message_sent, Toast.LENGTH_SHORT).show();
                 if (getActivity() != null) {
                     mVg.findViewById(R.id.sendloading).setVisibility(View.GONE);
                     mVg.findViewById(R.id.sendbtn).setVisibility(View.VISIBLE);
@@ -256,7 +256,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void messageNotSent(XMPPMessage pMessage) {
                 if (getActivity() != null) {
-                    Toast.makeText(getActivity(), "Message non envoyé", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.message_not_sent, Toast.LENGTH_SHORT).show();
                 }
             }
         });

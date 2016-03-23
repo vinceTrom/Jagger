@@ -2,4 +2,9 @@
 <resources>
     <string name="logging_failed">Logging Failed</string>
     <string name="connection_failed">Connection Failed</string>
+    <string name="connection_and_logged">Connected And Logged</string>
+    <string name="message_received">Message Received :</string>
+    <string name="message_sent">Message Sent</string>
+    <string name="message_not_sent">Message Not Sent</string>
+
 </resources>
