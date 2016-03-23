@@ -7,53 +7,52 @@ import java.util.Date;
 
 public class XMPPMessage {
 
+    private static SimpleDateFormat sDefaultDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private static SimpleDateFormat sTodayDateFormat = new SimpleDateFormat("HH:mm");
 
-    private String _senderId;
-    private String _receiverId;
-    private String _message;
-    private Date _date;
+    private String mSenderId;
+    private String mReceiverId;
+    private String mMessage;
+    private Date mDate;
 
     public XMPPMessage(String senderId, String receiverId, String message, long date) {
-        _senderId = senderId;
-        _receiverId = receiverId;
-        _message = message;
-        _date = new Date(date);
+        mSenderId = senderId;
+        mReceiverId = receiverId;
+        mMessage = message;
+        mDate = new Date(date);
     }
 
     public String getSenderId() {
-        return _senderId;
+        return mSenderId;
     }
 
     public String getReceiverId() {
-        return _receiverId;
+        return mReceiverId;
     }
 
     public String getBareSenderId() {
-        return  StringUtils.parseBareAddress(_senderId);
+        return  StringUtils.parseBareAddress(mSenderId);
     }
 
     public String getBareReceiverId() {
-        return  StringUtils.parseBareAddress(_receiverId);
+        return  StringUtils.parseBareAddress(mReceiverId);
     }
 
     public String getMessage() {
-        return _message;
+        return mMessage;
     }
 
     public Date getDate() {
-        return _date;
+        return mDate;
     }
 
-    private SimpleDateFormat _dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    private SimpleDateFormat _todayDateFormat = new SimpleDateFormat("HH:mm");
 
-
-    public String getDateString() {
+    public static String getDateString(Date pDate) {
         Date today = new Date();
-        if (_date.getYear() == today.getYear() && _date.getMonth() == today.getMonth() && _date.getDate() == today.getDate())
-            return _todayDateFormat.format(_date);
+        if (pDate.getYear() == today.getYear() && pDate.getMonth() == today.getMonth() && pDate.getDate() == today.getDate())
+            return sTodayDateFormat.format(pDate);
         else
-            return _dateFormat.format(_date);
+            return sDefaultDateFormat.format(pDate);
     }
 
 }

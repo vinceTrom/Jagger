@@ -8,18 +8,18 @@ import org.jivesoftware.smack.packet.IQ;
  */
 public class TokenIQ extends IQ {
 
-    private String _token;
-    private String _platform;
+    private String mToken;
+    private String mPlatform;
 
     public TokenIQ(String platform, String token) {
-        _platform = platform;
-        _token = token;
+        mPlatform = platform;
+        mToken = token;
         setType(Type.SET);
     }
 
     @Override
     public String getChildElementXML() {
-        return "<query xmlns='urn:xmpp:tokeniq'><token>" + _token + "</token><platform>" + _platform + "</platform></query>";
+        return "<query xmlns='urn:xmpp:tokeniq'><token>" + mToken + "</token><platform>" + mPlatform + "</platform></query>";
     }
 
 }

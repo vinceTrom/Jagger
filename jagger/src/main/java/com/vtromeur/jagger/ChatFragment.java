@@ -298,7 +298,7 @@ public class ChatFragment extends Fragment {
 
 
         timeV.setMaxWidth((int) (Utils.getScreenWidth() * 0.7f));
-        timeV.setText(message.getDateString());
+        timeV.setText(XMPPMessage.getDateString(message.getDate()));
         int margin = res.getDimensionPixelSize(R.dimen.chat_time_horizontal_margin);
         FrameLayout.LayoutParams flp2 = (FrameLayout.LayoutParams) timeV.getLayoutParams();
         flp2.gravity = flp2.gravity | (receive ? Gravity.LEFT : Gravity.RIGHT);

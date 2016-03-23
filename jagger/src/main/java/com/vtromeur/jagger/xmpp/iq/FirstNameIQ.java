@@ -8,16 +8,16 @@ import org.jivesoftware.smack.packet.IQ;
  */
 public class FirstNameIQ extends IQ {
 
-    private String _firstName;
+    private String mFirstName;
 
     public FirstNameIQ(String firstName) {
-        _firstName = firstName;
+        mFirstName = firstName;
         setType(Type.SET);
     }
 
     @Override
     public String getChildElementXML() {
-        return "<query xmlns=\"urn:xmpp:firstnameiq\"><firstname>" + _firstName + "</firstname></query>";
+        return "<query xmlns=\"urn:xmpp:firstnameiq\"><firstname>" + mFirstName + "</firstname></query>";
     }
 
 }
