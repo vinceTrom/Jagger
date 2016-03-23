@@ -51,14 +51,21 @@ public class ChatFragment extends Fragment {
     private String mChatterName;
 
 
-    private ViewGroup _vg;
+    private ViewGroup mVg;
     private EditText mEditText;
     private View mSendBtn;
     private ScrollView mScrollView;
     private LinearLayout mMessageListView;
 
-    private Handler _handler = new Handler();
+    private Handler mHandler = new Handler();
 
+    /**
+     * Return an instance of ChatFragment, initialized with the two users ids
+     * @param pUserName your chat username
+     * @param pPassword your chat password
+     * @param pChatterName the other user username
+     * @return a usable instance of ChatFragment
+     */
     public static ChatFragment getInstance(String pUserName, String pPassword, String pChatterName) {
         ChatFragment chatFrag = new ChatFragment();
         Bundle bundle = new Bundle();
@@ -80,20 +87,20 @@ public class ChatFragment extends Fragment {
         mPassword = getArguments().getString(PASSWORD_KEY);
         mChatterName = getArguments().getString(CHATTERNAME_KEY);
 
-        _vg = (ViewGroup) inflater.inflate(R.layout.fragment_chat, container, false);
+        mVg = (ViewGroup) inflater.inflate(R.layout.fragment_chat, container, false);
 
-        initViews(_vg);
-        initViewsListeners(_vg);
+        initViews(mVg);
+        initViewsListeners(mVg);
 
         initXMPPService();
 
         //UnreadMessageManager.getInstance().removeHasUnreadMessage(mUser.getId());
 
-        return _vg;
+        return mVg;
     }
 
     private void removeLoaderView() {
-        //_vg.removeView(_vg.findViewById(R.id.loaderView));
+        //mVg.removeView(mVg.findViewById(R.id.loaderView));
     }
 
     @Override
@@ -157,7 +164,7 @@ public class ChatFragment extends Fragment {
                     mMessages = messages;
                     addMessagesToList(mMessages);
                     //if(mXmppService.isConnected()){
-                    _handler.postDelayed(new Runnable() {
+                    mHandler.postDelayed(new Runnable() {
 
                         @Override
                         public void run() {
@@ -225,8 +232,8 @@ public class ChatFragment extends Fragment {
         if (message.length() == 0)
             return;
 
-        _vg.findViewById(R.id.sendloading).setVisibility(View.VISIBLE);
-        _vg.findViewById(R.id.sendbtn).setVisibility(View.GONE);
+        mVg.findViewById(R.id.sendloading).setVisibility(View.VISIBLE);
+        mVg.findViewById(R.id.sendbtn).setVisibility(View.GONE);
 
 
         mXmppService.sendMessage(mChatterName, message, new MessageSendingListener() {
@@ -235,8 +242,8 @@ public class ChatFragment extends Fragment {
             public void messageSent(XMPPMessage pMessage) {
                 Toast.makeText(getActivity(), "Message envoyé", Toast.LENGTH_SHORT).show();
                 if (getActivity() != null) {
-                    _vg.findViewById(R.id.sendloading).setVisibility(View.GONE);
-                    _vg.findViewById(R.id.sendbtn).setVisibility(View.VISIBLE);
+                    mVg.findViewById(R.id.sendloading).setVisibility(View.GONE);
+                    mVg.findViewById(R.id.sendbtn).setVisibility(View.VISIBLE);
 
                     mEditText.setText("");
                     mMessages.add(pMessage);
@@ -314,7 +321,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void scrollDown() {
-        _handler.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
 
             @Override
             public void run() {
