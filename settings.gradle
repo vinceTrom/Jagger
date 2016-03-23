@@ -1,1 +1,1 @@
-include ':app', ':jagger'
+include ':sample', ':jagger'
