@@ -51,7 +51,7 @@ public class SendMessageTask extends AsyncTask<Void, Void, Integer> {
                 return MessageSendingListener.MESSAGE_NOT_SENT;
             }
         } else {
-            throw new IllegalStateException("Uer must be connected and authenticated to be able to send a message");
+            throw new IllegalStateException("User must be connected and authenticated to be able to send a message");
         }
     }
 
