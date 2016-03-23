@@ -31,6 +31,11 @@ import java.util.ArrayList;
 
 
 /**
+ * The ChatFragment is the UI element which allow you to chat with another user
+ *<br>
+ * Call the {@link #getInstance(String, String, String) getInstance} method to initialize one
+ * and add it in your fullscreen view.
+ *<br>
  * Created by Vincent Tromeur on 03/12/15.
  */
 
