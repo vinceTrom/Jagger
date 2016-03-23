@@ -126,14 +126,14 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void loggingFailed() {
-                Toast.makeText(getActivity(), "logging Failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.logging_failed, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void connectionFailed() {
                 removeLoaderView();
                 if (getActivity() != null)
-                    Toast.makeText(getActivity(), "connection Failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.connection_failed, Toast.LENGTH_SHORT).show();
             }
 
             @Override

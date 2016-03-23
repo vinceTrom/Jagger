@@ -1,11 +1,10 @@
-apply plugin: 'com.android.library’
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "jagger.vtromeur.com.jagger"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
