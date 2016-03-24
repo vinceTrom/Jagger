@@ -284,7 +284,7 @@ public class ChatFragment extends Fragment {
 
     private void addMessageToList(XMPPMessage message) {
 
-        boolean receive = message.getReceiverId().contains("vtrom");
+        boolean isMessageReceived = message.isReceived();
 
         Resources res = mScrollView.getResources();
 
@@ -294,15 +294,15 @@ public class ChatFragment extends Fragment {
         final View picV = vg.findViewById(R.id.pic);
 
         FrameLayout.LayoutParams picflp = (FrameLayout.LayoutParams) picV.getLayoutParams();
-        picflp.gravity = Gravity.BOTTOM | (receive ? Gravity.LEFT : Gravity.RIGHT);
+        picflp.gravity = Gravity.BOTTOM | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
 
 
         messV.setMaxWidth((int) (Utils.getScreenWidth() * 0.8f));
-        messV.setBackgroundResource(receive ? R.drawable.chat_bubble_left : R.drawable.chat_bubble_right);
+        messV.setBackgroundResource(isMessageReceived ? R.drawable.chat_bubble_left : R.drawable.chat_bubble_right);
         messV.setText(message.getMessage());
-        messV.setTextColor(receive ? Color.WHITE : Color.BLACK);
+        messV.setTextColor(isMessageReceived ? Color.WHITE : Color.BLACK);
         FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) messV.getLayoutParams();
-        flp.gravity = receive ? Gravity.LEFT : Gravity.RIGHT;
+        flp.gravity = isMessageReceived ? Gravity.LEFT : Gravity.RIGHT;
         int bottomMarginForMess = res.getDimensionPixelOffset(R.dimen.chat_space_for_picandtime);
         flp.setMargins(flp.leftMargin, flp.topMargin, flp.rightMargin, bottomMarginForMess);
 
@@ -311,9 +311,9 @@ public class ChatFragment extends Fragment {
         timeV.setText(XMPPMessage.getDateString(message.getDate()));
         int margin = res.getDimensionPixelSize(R.dimen.chat_time_horizontal_margin);
         FrameLayout.LayoutParams flp2 = (FrameLayout.LayoutParams) timeV.getLayoutParams();
-        flp2.gravity = flp2.gravity | (receive ? Gravity.LEFT : Gravity.RIGHT);
+        flp2.gravity = flp2.gravity | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
         int bottomMarginForTimeStamp = res.getDimensionPixelOffset(R.dimen.chat_timestampbottom_for_picandtime);
-        flp2.setMargins(receive ? margin : 0, flp2.topMargin, receive ? 0 : margin, bottomMarginForTimeStamp);
+        flp2.setMargins(isMessageReceived ? margin : 0, flp2.topMargin, isMessageReceived ? 0 : margin, bottomMarginForTimeStamp);
 
  /*
         String url = mUser.getPicUrl();

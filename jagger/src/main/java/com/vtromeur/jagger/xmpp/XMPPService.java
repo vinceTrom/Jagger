@@ -162,7 +162,7 @@ public class XMPPService {
             chatterName = chatterName + "@" + mServerConfig.getUsernameSuffix();
         }
 
-        XMPPMessage xMPPMessage = new XMPPMessage(userName, chatterName, pMessage, System.currentTimeMillis());
+        XMPPMessage xMPPMessage = new XMPPMessage(userName, chatterName, pMessage, System.currentTimeMillis(), false);
         sendMessage(xMPPMessage, callback);
     }
 

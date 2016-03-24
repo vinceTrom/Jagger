@@ -37,7 +37,7 @@ public class MessageReceptionListener implements PacketListener {
         if (messageTimeStamp == 0)
             messageTimeStamp = System.currentTimeMillis();
         if (message.getBody() != null) {
-            final XMPPMessage XMPPmessage = new XMPPMessage(message.getFrom(), message.getTo(), message.getBody(), messageTimeStamp);
+            final XMPPMessage XMPPmessage = new XMPPMessage(message.getFrom(), message.getTo(), message.getBody(), messageTimeStamp, true);
 
             //ChatSessions.getInstance().refreshChatSessionTimeStamp(senderId, System.currentTimeMillis());
 

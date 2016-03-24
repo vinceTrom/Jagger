@@ -12,14 +12,16 @@ public class XMPPMessage {
 
     private String mSenderId;
     private String mReceiverId;
-    private String mMessage;
+    private String mMessageText;
     private Date mDate;
+    private boolean mIsReceived;
 
-    public XMPPMessage(String senderId, String receiverId, String message, long date) {
-        mSenderId = senderId;
-        mReceiverId = receiverId;
-        mMessage = message;
-        mDate = new Date(date);
+    public XMPPMessage(String pSenderId, String pReceiverId, String pMessageText, long pDate, boolean pIsReceived) {
+        mSenderId = pSenderId;
+        mReceiverId = pReceiverId;
+        mMessageText = pMessageText;
+        mDate = new Date(pDate);
+        mIsReceived = pIsReceived;
     }
 
     public String getSenderId() {
@@ -39,13 +41,20 @@ public class XMPPMessage {
     }
 
     public String getMessage() {
-        return mMessage;
+        return mMessageText;
     }
 
     public Date getDate() {
         return mDate;
     }
 
+    public boolean isReceived(){
+        return mIsReceived;
+    }
+
+    public boolean isSent(){
+        return !mIsReceived;
+    }
 
     public static String getDateString(Date pDate) {
         Date today = new Date();
