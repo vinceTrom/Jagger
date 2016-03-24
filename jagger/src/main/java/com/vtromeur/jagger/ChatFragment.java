@@ -45,6 +45,8 @@ public class ChatFragment extends Fragment {
     private static final String USERNAME_KEY = "USERNAME_KEY";
     private static final String PASSWORD_KEY = "PASSWORD_KEY";
     private static final String CHATTERNAME_KEY = "CHATTERNAME_KEY";
+    private static final String SERVER_CONFIG_KEY = "SERVER_CONFIG_KEY";
+
 
 
     private XMPPService mXmppService;
@@ -54,6 +56,8 @@ public class ChatFragment extends Fragment {
     private String mUserName;
     private String mPassword;
     private String mChatterName;
+
+    private XMPPServerConfig mServerConfig;
 
 
     private ViewGroup mVg;
@@ -71,12 +75,13 @@ public class ChatFragment extends Fragment {
      * @param pChatterName the other user username
      * @return a usable instance of ChatFragment
      */
-    public static ChatFragment getInstance(String pUserName, String pPassword, String pChatterName) {
+    public static ChatFragment getInstance(XMPPServerConfig pServerConfig, String pUserName, String pPassword, String pChatterName) {
         ChatFragment chatFrag = new ChatFragment();
         Bundle bundle = new Bundle();
         bundle.putString(USERNAME_KEY, pUserName);
         bundle.putString(PASSWORD_KEY, pPassword);
         bundle.putString(CHATTERNAME_KEY, pChatterName);
+        bundle.putSerializable(SERVER_CONFIG_KEY, pServerConfig);
         chatFrag.setArguments(bundle);
         return chatFrag;
     }
@@ -92,6 +97,7 @@ public class ChatFragment extends Fragment {
         mPassword = getArguments().getString(PASSWORD_KEY);
         mChatterName = getArguments().getString(CHATTERNAME_KEY);
 
+        mServerConfig = (XMPPServerConfig) getArguments().getSerializable(SERVER_CONFIG_KEY);
         mVg = (ViewGroup) inflater.inflate(R.layout.fragment_chat, container, false);
 
         initViews(mVg);
@@ -120,12 +126,11 @@ public class ChatFragment extends Fragment {
 
 
     private void initXMPPService() {
-        XMPPServerConfig serverConfig = new XMPPServerConfig("securejabber.me", "5222", "securejabber.me");
-        serverConfig.setSASLAuthenticationEnabled(true);
+        mServerConfig.setSASLAuthenticationEnabled(true);
 
         mXmppService = XMPPService.getInstance();
 
-        mXmppService.init(getActivity(), serverConfig);
+        mXmppService.init(getActivity(), mServerConfig);
 
         mXmppService.connectAndLogin(mUserName, mPassword, new ConnectionStateListener() {
 
