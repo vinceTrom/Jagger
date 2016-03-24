@@ -124,6 +124,11 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView (){
+        super.onDestroyView();
+        mXmppService.disconnect();
+    }
 
     private void initXMPPService() {
         mServerConfig.setSASLAuthenticationEnabled(true);
