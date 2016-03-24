@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">JaggerSample</string>
     <string name="action_settings">Settings</string>
+
+    <string name="fields_are_not_filled">Please fill all the fields</string>
+
 </resources>
