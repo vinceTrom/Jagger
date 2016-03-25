@@ -3,12 +3,15 @@ package com.vtromeur.jagger.xmpp;
 import android.os.Handler;
 import android.util.Log;
 
+import com.vtromeur.jagger.DatabaseHelper;
 import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.packet.DelayInformation;
+
+import java.sql.SQLException;
 
 /**
  * Created by Vincent Tromeur on 10/12/15.
@@ -38,13 +41,23 @@ public class MessageReceptionListener implements PacketListener {
             messageTimeStamp = System.currentTimeMillis();
         if (message.getBody() != null) {
             final XMPPMessage XMPPmessage = new XMPPMessage(message.getFrom(), message.getTo(), message.getBody(), messageTimeStamp, true);
-            //TODO save message in DB
+
+            saveMessageInDB(XMPPmessage);
+
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     mMessageReceiver.messageReceived(XMPPmessage);
                 }
             });
+        }
+    }
+
+    private void saveMessageInDB(XMPPMessage pMessage) {
+        try {
+            DatabaseHelper.getHelper().getMessageDao().create(pMessage);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

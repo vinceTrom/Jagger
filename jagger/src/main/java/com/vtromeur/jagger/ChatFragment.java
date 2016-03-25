@@ -20,6 +20,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
 import com.vtromeur.jagger.xmpp.XMPPService;
@@ -27,7 +30,9 @@ import com.vtromeur.jagger.xmpp.listeners.ConnectionStateListener;
 import com.vtromeur.jagger.xmpp.listeners.MessageSendingListener;
 import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -91,6 +96,8 @@ public class ChatFragment extends Fragment {
             savedInstanceState) {
 
         Utils.initScreenWidth(container.getContext());
+
+        DatabaseHelper.init(getActivity());
 
         mUserName = getArguments().getString(USERNAME_KEY);
         mPassword = getArguments().getString(PASSWORD_KEY);
@@ -161,12 +168,30 @@ public class ChatFragment extends Fragment {
                 Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
 
                 mMessages.add(message);
-                addMessageToList(message);
+                addMessageToScrollView(message);
                 scrollDown();
             }
         });
 
-        //TODO load message historical
+        addMessageListToScrollView(getLastMessages(mChatterName));
+    }
+
+    private static List<XMPPMessage> getLastMessages(String pChatterId){
+        try {
+            Dao<XMPPMessage, Integer> messageDao = DatabaseHelper.getHelper().getMessageDao();
+
+            QueryBuilder queryBuilder = messageDao.queryBuilder();
+            queryBuilder.where().eq(XMPPMessage.SENDER_ID, pChatterId)
+                    .or().eq(XMPPMessage.RECEIVER_ID, pChatterId);
+            queryBuilder.limit(100L);
+            queryBuilder.orderBy(XMPPMessage.DATE, true);
+
+            PreparedQuery query = queryBuilder.prepare();
+            return messageDao.query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     private void initViews(ViewGroup vg) {
@@ -237,7 +262,7 @@ public class ChatFragment extends Fragment {
 
                     mEditText.setText("");
                     mMessages.add(pMessage);
-                    addMessageToList(pMessage);
+                    addMessageToScrollView(pMessage);
                     scrollDown();
 
                 }
@@ -253,16 +278,16 @@ public class ChatFragment extends Fragment {
     }
 
 
-    private void addMessagesToList(ArrayList<XMPPMessage> messages) {
+    private void addMessageListToScrollView(List<XMPPMessage> messages) {
         if (messages == null)
             return;
         for (int i = 0; i < messages.size(); i++) {
-            addMessageToList(messages.get(i));
+            addMessageToScrollView(messages.get(i));
         }
         scrollDown();
     }
 
-    private void addMessageToList(XMPPMessage message) {
+    private void addMessageToScrollView(XMPPMessage message) {
 
         boolean isMessageReceived = message.isReceived();
 
