@@ -161,7 +161,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void messageReceived(XMPPMessage message) {
-                Toast.makeText(getActivity(), R.string.message_received + message.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
 
                 mMessages.add(message);
                 addMessageToList(message);
