@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "sample.jagger.vtromeur.com.jaggersample"
+        applicationId "com.vtromeur.jaggersample"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
