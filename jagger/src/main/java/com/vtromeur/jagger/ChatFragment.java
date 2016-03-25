@@ -90,7 +90,6 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
 
-        //ChatSessions.getInstance().addChatSession(mUser, System.currentTimeMillis());
         Utils.initScreenWidth(container.getContext());
 
         mUserName = getArguments().getString(USERNAME_KEY);
@@ -104,8 +103,6 @@ public class ChatFragment extends Fragment {
         initViewsListeners(mVg);
 
         initXMPPService();
-
-        //UnreadMessageManager.getInstance().removeHasUnreadMessage(mUser.getId());
 
         return mVg;
     }
@@ -168,30 +165,8 @@ public class ChatFragment extends Fragment {
                 scrollDown();
             }
         });
-        /*
-        Log.d("", "Debut Chgt. histo de chat");
-        XMPPMessagesCache.getInstance().getCachedMessages(mUser.getId(), new XMPPMessagesCache.GetCachedMessagesCallback() {
-            @Override
-            public void messagesRetrieved(ArrayList<XMPPMessage> messages) {
-                Log.d("", "Fin Chgt. histo de chat");
 
-                if(messages != null){
-                    mMessages = messages;
-                    addMessagesToList(mMessages);
-                    //if(mXmppService.isConnected()){
-                    mHandler.postDelayed(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            removeLoaderView();
-                        }
-                    }, 200);
-                    //}
-                }
-            }
-        });
-        */
-
+        //TODO load message historical
     }
 
     private void initViews(ViewGroup vg) {

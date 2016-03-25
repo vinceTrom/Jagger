@@ -47,7 +47,6 @@ public class XMPPService {
     }
 
     public void init(Context ctx, XMPPServerConfig pServerConfig) {
-        // XMPPMessagesCache.getInstance().init(ctx);
         mSmackInstance = SmackAndroid.init(ctx);
 
         // Create a connection

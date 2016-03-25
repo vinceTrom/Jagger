@@ -23,22 +23,12 @@ public class SendMessageTask extends AsyncTask<Void, Void, Integer> {
         mMessage = pMessage;
         mMessageSendingListener = pListener;
     }
-/*
-    private void messageSent() {
-        //XMPPMessagesCache.getInstance().saveMessage(message.getReceiverId(), message);
-        //ChatSessions.getInstance().refreshChatSessionTimeStamp(message.getReceiverId(), System.currentTimeMillis());
-        callback.messageSent();
-    }
-    private void messageNOTSent() {
-        callback.messageNotSent();
-    }
-*/
 
     @Override
     protected Integer doInBackground(Void... params) {
-        String dest = mMessage.getReceiverId();
+        //TODO save message in DB
 
-        final Message msg = new Message(dest, Message.Type.chat);
+        final Message msg = new Message(mMessage.getReceiverId(), Message.Type.chat);
         msg.setBody(mMessage.getMessage());
         msg.setFrom(mMessage.getSenderId());
         //msg.addExtension(PacketExtensionProvider);
