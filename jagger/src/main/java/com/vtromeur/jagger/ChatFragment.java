@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
 import com.vtromeur.jagger.xmpp.XMPPService;
@@ -173,16 +174,20 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        addMessageListToScrollView(getLastMessages(mChatterName));
+        addMessageListToScrollView(getLastMessages(mUserName, mChatterName));
     }
 
-    private static List<XMPPMessage> getLastMessages(String pChatterId){
+    private static List<XMPPMessage> getLastMessages(String pUserId, String pChatterId){
         try {
             Dao<XMPPMessage, Integer> messageDao = DatabaseHelper.getHelper().getMessageDao();
 
             QueryBuilder queryBuilder = messageDao.queryBuilder();
-            queryBuilder.where().eq(XMPPMessage.SENDER_ID, pChatterId)
-                    .or().eq(XMPPMessage.RECEIVER_ID, pChatterId);
+            Where where = queryBuilder.where();
+            where.eq(XMPPMessage.SENDER_ID, pChatterId)
+                    .and().eq(XMPPMessage.RECEIVER_ID, pUserId);
+            where.eq(XMPPMessage.SENDER_ID, pUserId)
+                    .and().eq(XMPPMessage.RECEIVER_ID, pChatterId);
+            where.or(2);
             queryBuilder.limit(100L);
             queryBuilder.orderBy(XMPPMessage.DATE, true);
 
