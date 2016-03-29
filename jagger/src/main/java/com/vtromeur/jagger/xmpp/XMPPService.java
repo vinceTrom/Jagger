@@ -124,6 +124,7 @@ public class XMPPService {
                     @Override
                     public void accountCreationFailed() {
                         Log.i("XMPPClient", "Account creation failed");
+                        connectionListener.connectionFailed();
                     }
                 }).execute();
             }
