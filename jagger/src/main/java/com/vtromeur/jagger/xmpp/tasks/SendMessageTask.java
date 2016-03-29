@@ -30,9 +30,9 @@ public class SendMessageTask extends AsyncTask<Void, Void, Integer> {
     @Override
     protected Integer doInBackground(Void... params) {
 
-        final Message msg = new Message(mMessage.getReceiverId(), Message.Type.chat);
+        final Message msg = new Message(mMessage.getReceiverId()+"@"+mXMPPConnection.getServiceName(), Message.Type.chat);
         msg.setBody(mMessage.getMessage());
-        msg.setFrom(mMessage.getSenderId());
+        msg.setFrom(mMessage.getSenderId()+"@"+mXMPPConnection.getServiceName());
         //msg.addExtension(PacketExtensionProvider);
         if (mXMPPConnection.isConnected() && mXMPPConnection.isAuthenticated()) {
             try {
