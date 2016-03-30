@@ -142,7 +142,7 @@ public class ChatFragment extends Fragment {
 
         mXmppService.init(getActivity(), mServerConfig);
 
-        mXmppService.connectAndLogin(mUserName, mPassword, new ConnectionStateListener() {
+        mXmppService.connect(mUserName, mPassword, new ConnectionStateListener() {
 
             @Override
             public void loggingFailed() {

@@ -6,5 +6,6 @@ package com.vtromeur.jagger.xmpp;
 public class Credentials {
 
     public String mUsername;
+    public String mUserAlias;
     public String mPassword;
 }

@@ -78,9 +78,7 @@ public class ConnectAndLoginTask extends AsyncTask<Void, Void, Integer> {
 					mConnection.sendPacket(iqPushToken);
 				}
 */
-        IQ nameToken = new FirstNameIQ("moi");
-        String iq = nameToken.toXML();
-        Log.e("", "nameToken: " + iq);
+        IQ nameToken = new FirstNameIQ(mCredentials.mUserAlias);
         mXMPPConnection.sendPacket(nameToken);
     }
 

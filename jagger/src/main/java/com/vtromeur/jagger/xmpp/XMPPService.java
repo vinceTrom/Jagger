@@ -93,15 +93,21 @@ public class XMPPService {
         }).start();
     }
 
-    public void connectAndLogin(final String userName, final String password, final ConnectionStateListener connectionListener) {
+
+    public void connect(String userName, String password, ConnectionStateListener connectionListener) {
+        connect(userName, password, userName, connectionListener);
+    }
+
+    public void connect(String userName, String password, String userAlias, ConnectionStateListener connectionListener) {
         mUserCredentials = new Credentials();
         mUserCredentials.mUsername = userName;
         mUserCredentials.mPassword = password;
+        mUserCredentials.mUserAlias = userAlias;
 
-        connectAndLogin(connectionListener);
+        launchConnectAndLoginTask(connectionListener);
     }
 
-    public void connectAndLogin(final ConnectionStateListener connectionListener) {
+    private void launchConnectAndLoginTask(final ConnectionStateListener connectionListener) {
         if (mConnection.isConnected())
             return;
 
@@ -118,7 +124,7 @@ public class XMPPService {
                     @Override
                     public void accountCreated() {
                         Log.i("XMPPClient", "Account created, will try to connect now");
-                        connectAndLogin(connectionListener);
+                        launchConnectAndLoginTask(connectionListener);
                     }
 
                     @Override
