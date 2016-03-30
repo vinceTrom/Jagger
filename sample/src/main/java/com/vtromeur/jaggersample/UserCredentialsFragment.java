@@ -46,7 +46,7 @@ public class UserCredentialsFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 if (!areAllFieldFilled()) {
-                    Toast.makeText(getActivity(), R.string.fields_are_not_filled, Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity(), R.string.fields_are_not_filled, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 String userId = mUserIDField.getText().toString();
