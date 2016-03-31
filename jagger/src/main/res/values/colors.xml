@@ -9,4 +9,11 @@
     <color name="grey">#AAAAAA</color>
     <color name="dark_grey">#888888</color>
 
+    <color name="user_message_default_background">#CCCCCC</color>
+    <color name="user_message_default_text_color">#000000</color>
+
+    <color name="chatter_message_default_background">#EB3349</color>
+    <color name="chatter_message_default_text_color">#FFFFFF</color>
+
+
 </resources>

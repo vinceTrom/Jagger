@@ -2,28 +2,24 @@ package com.vtromeur.jagger;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
+import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
 import com.vtromeur.jagger.xmpp.XMPPService;
@@ -54,6 +50,7 @@ public class ChatFragment extends Fragment {
     private static final String SERVER_CONFIG_KEY = "SERVER_CONFIG_KEY";
 
 
+    private UICustomization mUICustomization = new UICustomization();
 
     private XMPPService mXmppService;
 
@@ -294,37 +291,7 @@ public class ChatFragment extends Fragment {
 
     private void addMessageToScrollView(XMPPMessage message) {
 
-        boolean isMessageReceived = message.isReceived();
-
-        Resources res = mScrollView.getResources();
-
-        ViewGroup vg = (ViewGroup) LayoutInflater.from(mMessageListView.getContext()).inflate(R.layout.chat_message, mMessageListView, false);
-        TextView messV = (TextView) vg.findViewById(R.id.message);
-        TextView timeV = (TextView) vg.findViewById(R.id.timeStamp);
-        final View picV = vg.findViewById(R.id.pic);
-
-        FrameLayout.LayoutParams picflp = (FrameLayout.LayoutParams) picV.getLayoutParams();
-        picflp.gravity = Gravity.BOTTOM | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
-
-
-        messV.setMaxWidth((int) (Utils.getScreenWidth() * 0.8f));
-        messV.setBackgroundResource(isMessageReceived ? R.drawable.chat_bubble_left : R.drawable.chat_bubble_right);
-        messV.setText(message.getMessage());
-        messV.setTextColor(isMessageReceived ? Color.WHITE : Color.BLACK);
-        FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) messV.getLayoutParams();
-        flp.gravity = isMessageReceived ? Gravity.LEFT : Gravity.RIGHT;
-        int bottomMarginForMess = res.getDimensionPixelOffset(R.dimen.chat_space_for_picandtime);
-        flp.setMargins(flp.leftMargin, flp.topMargin, flp.rightMargin, bottomMarginForMess);
-
-
-        timeV.setMaxWidth((int) (Utils.getScreenWidth() * 0.7f));
-        timeV.setText(XMPPMessage.getDateString(message.getDate()));
-        int margin = res.getDimensionPixelSize(R.dimen.chat_time_horizontal_margin);
-        FrameLayout.LayoutParams flp2 = (FrameLayout.LayoutParams) timeV.getLayoutParams();
-        flp2.gravity = flp2.gravity | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
-        int bottomMarginForTimeStamp = res.getDimensionPixelOffset(R.dimen.chat_timestampbottom_for_picandtime);
-        flp2.setMargins(isMessageReceived ? margin : 0, flp2.topMargin, isMessageReceived ? 0 : margin, bottomMarginForTimeStamp);
-
+        ViewGroup vg = UIHelper.buildMessageView(mMessageListView.getContext(), message, mMessageListView, mUICustomization);
  /*
         String url = mUser.getPicUrl();
 
