@@ -89,6 +89,12 @@ public class ChatFragment extends Fragment {
         return chatFrag;
     }
 
+    public void setUICustomization(UICustomization pUICustomization){
+        if(pUICustomization != null) {
+            mUICustomization = pUICustomization;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
