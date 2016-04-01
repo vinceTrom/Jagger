@@ -17,6 +17,8 @@ import com.vtromeur.jagger.UICustomization;
 import com.vtromeur.jagger.Utils;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 
+import static com.vtromeur.jagger.UICustomization.UNDEFINED_COLOR;
+
 /**
  * Created by Vince on 30/03/16.
  */
@@ -77,17 +79,17 @@ public class UIHelper {
     private static int getMessageBackgroundColor(Resources res, UICustomization pCustomization, boolean pIsMessageReceived){
         int bubbleColor;
         if(pIsMessageReceived){
-            if(pCustomization.mChatterMessageBackgroundColor != -1){
+            if(pCustomization.mChatterMessageBackgroundColor != UNDEFINED_COLOR){
                 bubbleColor = pCustomization.mChatterMessageBackgroundColor;
-            }else if(pCustomization.mChatterMessageBackgroundColorResource != -1){
+            }else if(pCustomization.mChatterMessageBackgroundColorResource != UNDEFINED_COLOR){
                 bubbleColor = res.getColor(pCustomization.mChatterMessageBackgroundColorResource);
             }else{
                 bubbleColor = res.getColor(UICustomization.CHATTER_MESSAGE_DEFAULT_BACKGROUND_COLOR_RES);
             }
         }else{
-            if(pCustomization.mUserMessageBackgroundColor != -1){
+            if(pCustomization.mUserMessageBackgroundColor != UNDEFINED_COLOR){
                 bubbleColor = pCustomization.mUserMessageBackgroundColor;
-            }else if(pCustomization.mUserMessageBackgroundColorResource != -1){
+            }else if(pCustomization.mUserMessageBackgroundColorResource != UNDEFINED_COLOR){
                 bubbleColor = res.getColor(pCustomization.mUserMessageBackgroundColorResource);
             }else{
                 bubbleColor = res.getColor(UICustomization.USER_MESSAGE_DEFAULT_BACKGROUND_COLOR_RES);
@@ -97,24 +99,24 @@ public class UIHelper {
     }
 
     private static int getMessageTextColor(Resources res, UICustomization pCustomization, boolean pIsMessageReceived){
-        int bubbleColor;
+        int textColor;
         if(pIsMessageReceived){
-            if(pCustomization.mChatterMessageTextColor != -1){
-                bubbleColor = pCustomization.mChatterMessageTextColor;
-            }else if(pCustomization.mChatterMessageTextColorResource != -1){
-                bubbleColor = res.getColor(pCustomization.mChatterMessageTextColorResource);
+            if(pCustomization.mChatterMessageTextColor != UNDEFINED_COLOR){
+                textColor = pCustomization.mChatterMessageTextColor;
+            }else if(pCustomization.mChatterMessageTextColorResource != UNDEFINED_COLOR){
+                textColor = res.getColor(pCustomization.mChatterMessageTextColorResource);
             }else{
-                bubbleColor = res.getColor(UICustomization.CHATTER_MESSAGE_DEFAULT_TEXT_COLOR_RES);
+                textColor = res.getColor(UICustomization.CHATTER_MESSAGE_DEFAULT_TEXT_COLOR_RES);
             }
         }else{
-            if(pCustomization.mUserMessageTextColor != -1){
-                bubbleColor = pCustomization.mUserMessageTextColor;
-            }else if(pCustomization.mUserMessageTextColorResource != -1){
-                bubbleColor = res.getColor(pCustomization.mUserMessageTextColorResource);
+            if(pCustomization.mUserMessageTextColor != UNDEFINED_COLOR){
+                textColor = pCustomization.mUserMessageTextColor;
+            }else if(pCustomization.mUserMessageTextColorResource != UNDEFINED_COLOR){
+                textColor = res.getColor(pCustomization.mUserMessageTextColorResource);
             }else{
-                bubbleColor = res.getColor(UICustomization.USER_MESSAGE_DEFAULT_TEXT_COLOR_RES);
+                textColor = res.getColor(UICustomization.USER_MESSAGE_DEFAULT_TEXT_COLOR_RES);
             }
         }
-        return bubbleColor;
+        return textColor;
     }
 }
