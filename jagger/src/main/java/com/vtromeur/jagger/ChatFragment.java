@@ -112,10 +112,16 @@ public class ChatFragment extends Fragment {
 
         initViews(mVg);
         initViewsListeners(mVg);
+        applyViewCustomization(mVg);
 
         initXMPPService();
 
         return mVg;
+    }
+
+    private void applyViewCustomization(View pView){
+        int color = UIHelper.getBackgroundColor(pView.getResources(), mUICustomization);
+        pView.setBackgroundColor(color);
     }
 
     private void removeLoaderView() {

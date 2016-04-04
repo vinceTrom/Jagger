@@ -119,4 +119,14 @@ public class UIHelper {
         }
         return textColor;
     }
+
+    public static int getBackgroundColor(Resources res, UICustomization pCustomization){
+        if(pCustomization.mBackgroundColor != UNDEFINED_COLOR){
+            return  pCustomization.mBackgroundColor;
+        }else if(pCustomization.mBackgroundColorResource != UNDEFINED_COLOR){
+            return  res.getColor(pCustomization.mBackgroundColorResource);
+        }else{
+            return res.getColor(UICustomization.DEFAULT_BACKGROUND_COLOR_RES);
+        }
+    }
 }

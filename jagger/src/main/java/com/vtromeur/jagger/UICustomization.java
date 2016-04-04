@@ -14,6 +14,9 @@ public class UICustomization {
     public static final int CHATTER_MESSAGE_DEFAULT_BACKGROUND_COLOR_RES = R.color.chatter_message_default_background;
     public static final int CHATTER_MESSAGE_DEFAULT_TEXT_COLOR_RES = R.color.chatter_message_default_text_color;
 
+    public static final int DEFAULT_BACKGROUND_COLOR_RES = R.color.light_white;
+
+
     public int mUserMessageBackgroundColor = UNDEFINED_COLOR;
     public int mUserMessageBackgroundColorResource = UNDEFINED_COLOR;
     public int mUserMessageTextColor = UNDEFINED_COLOR;
@@ -22,4 +25,9 @@ public class UICustomization {
     public int mChatterMessageBackgroundColorResource = UNDEFINED_COLOR;
     public int mChatterMessageTextColor = UNDEFINED_COLOR;
     public int mChatterMessageTextColorResource = UNDEFINED_COLOR;
+
+    public int mBackgroundColorResource = UNDEFINED_COLOR;
+    public int mBackgroundColor = UNDEFINED_COLOR;
+
+
 }
