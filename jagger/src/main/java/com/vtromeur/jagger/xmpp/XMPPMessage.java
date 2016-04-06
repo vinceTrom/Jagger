@@ -3,8 +3,6 @@ package com.vtromeur.jagger.xmpp;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import org.jivesoftware.smack.util.StringUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,8 +40,8 @@ public class XMPPMessage {
     public XMPPMessage(){}
 
     public XMPPMessage(String pSenderId, String pReceiverId, String pMessageText, long pDate, boolean pIsReceived) {
-        mSenderId = StringUtils.parseName(pSenderId);
-        mReceiverId = StringUtils.parseName(pReceiverId);
+        mSenderId = pSenderId;
+        mReceiverId = pReceiverId;
         mMessageText = pMessageText;
         mDate = new Date(pDate);
         mIsReceived = pIsReceived;
@@ -55,6 +53,14 @@ public class XMPPMessage {
 
     public String getReceiverId() {
         return mReceiverId;
+    }
+
+    public void setSenderId(String pSenderId) {
+        mSenderId = pSenderId;
+    }
+
+    public void setReceiverId(String pReceiverId) {
+        mReceiverId = pReceiverId;
     }
 
     public String getMessage() {

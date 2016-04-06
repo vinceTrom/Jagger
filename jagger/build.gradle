@@ -23,5 +23,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.j256.ormlite:ormlite-android:4.48'
-    compile files('libs/asmack-android-17-0.8.3.jar')
+    compile 'org.igniterealtime.smack:smack-android:4.1.0-rc1'
+    compile 'org.igniterealtime.smack:smack-tcp:4.1.0-rc1'
+    //compile files('libs/asmack-android-17-0.8.3.jar')
 }

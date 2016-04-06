@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import com.vtromeur.jagger.xmpp.Credentials;
 import com.vtromeur.jagger.xmpp.listeners.XMPPAccountCreationListener;
 
-import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPConnection;
 
 /**
@@ -25,6 +24,7 @@ public class CreateAccountTask extends AsyncTask<Void, Void, Integer> {
 
     @Override
     protected Integer doInBackground(Void... params) {
+        /*
         AccountManager accountMng = mXMPPConnection.getAccountManager();
         try {
             accountMng.createAccount(mCredentials.mUsername, mCredentials.mPassword);
@@ -33,6 +33,8 @@ public class CreateAccountTask extends AsyncTask<Void, Void, Integer> {
             e.printStackTrace();
             return XMPPAccountCreationListener.ACCOUNT_NOT_CREATED;
         }
+        */
+        return XMPPAccountCreationListener.ACCOUNT_NOT_CREATED;
     }
 
     @Override

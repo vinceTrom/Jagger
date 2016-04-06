@@ -3,13 +3,13 @@ package com.vtromeur.jagger.xmpp;
 import android.os.Handler;
 import android.util.Log;
 
-import com.vtromeur.jagger.DatabaseHelper;
+import com.vtromeur.jagger.db.DatabaseHelper;
 import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smackx.packet.DelayInformation;
+import org.jivesoftware.smack.packet.Stanza;
 
 import java.sql.SQLException;
 
@@ -27,13 +27,13 @@ public class MessageReceptionListener implements PacketListener {
     }
 
     @Override
-    public void processPacket(Packet pPacket) {
+    public void processPacket(Stanza pPacket) throws SmackException.NotConnectedException {
         Log.e("", "processPacket: " + pPacket.toXML());
         Message message = (Message) pPacket;
         long messageTimeStamp = 0;
         try {
-            DelayInformation inf = (DelayInformation) pPacket.getExtension("x", "jabber:x:delay");
-            messageTimeStamp = inf.getStamp().getTime();
+            //DelayInformation inf = (DelayInformation) pPacket.getExtension("x", "jabber:x:delay");
+            //messageTimeStamp = inf.getStamp().getTime();
         } catch (Exception e) {
             //e.printStackTrace();
         }
@@ -60,4 +60,5 @@ public class MessageReceptionListener implements PacketListener {
             e.printStackTrace();
         }
     }
+
 }

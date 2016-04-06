@@ -15,10 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
+import com.vtromeur.jagger.db.DatabaseHelper;
 import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
@@ -27,7 +24,6 @@ import com.vtromeur.jagger.xmpp.listeners.ConnectionStateListener;
 import com.vtromeur.jagger.xmpp.listeners.MessageSendingListener;
 import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +72,6 @@ public class ChatFragment extends Fragment {
      * @param pUserName your chat username
      * @param pPassword your chat password
      * @param pChatterName the other user username
-     * @return a usable instance of ChatFragment
      */
     public static ChatFragment getInstance(XMPPServerConfig pServerConfig, String pUserName, String pPassword, String pChatterName) {
         ChatFragment chatFrag = new ChatFragment();
@@ -132,7 +127,7 @@ public class ChatFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if (mXmppService != null)
-            mXmppService.setMessageReceiver(null);
+            mXmppService.setMessageReceiver(mChatterName, null);
         if (getActivity() != null) {
             hideSoftKeyboard();
         }
@@ -171,42 +166,28 @@ public class ChatFragment extends Fragment {
                 Toast.makeText(getActivity(), R.string.connection_and_logged, Toast.LENGTH_SHORT).show();
             }
         });
-        mXmppService.setMessageReceiver(new XMPPOnMessageReceivedListener() {
+        mXmppService.setMessageReceiver(mChatterName, new XMPPOnMessageReceivedListener() {
 
             @Override
-            public void messageReceived(XMPPMessage message) {
-                Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
+            public void messageReceived(final XMPPMessage message) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
 
-                mMessages.add(message);
-                addMessageToScrollView(message);
-                scrollDown();
+                        mMessages.add(message);
+                        addMessageToScrollView(message);
+                        scrollDown();
+                    }
+                });
+
             }
         });
 
-        addMessageListToScrollView(getLastMessages(mUserName, mChatterName));
+        addMessageListToScrollView(MessageDbHelper.getLastMessages(mUserName, mChatterName));
     }
 
-    private static List<XMPPMessage> getLastMessages(String pUserId, String pChatterId){
-        try {
-            Dao<XMPPMessage, Integer> messageDao = DatabaseHelper.getHelper().getMessageDao();
 
-            QueryBuilder queryBuilder = messageDao.queryBuilder();
-            Where where = queryBuilder.where();
-            where.eq(XMPPMessage.SENDER_ID, pChatterId)
-                    .and().eq(XMPPMessage.RECEIVER_ID, pUserId);
-            where.eq(XMPPMessage.SENDER_ID, pUserId)
-                    .and().eq(XMPPMessage.RECEIVER_ID, pChatterId);
-            where.or(2);
-            queryBuilder.limit(100L);
-            queryBuilder.orderBy(XMPPMessage.DATE, true);
-
-            PreparedQuery query = queryBuilder.prepare();
-            return messageDao.query(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
 
     private void initViews(ViewGroup vg) {
         mSendBtn = vg.findViewById(R.id.sendbtn);

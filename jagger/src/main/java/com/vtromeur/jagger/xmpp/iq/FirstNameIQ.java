@@ -1,23 +1,21 @@
 package com.vtromeur.jagger.xmpp.iq;
 
-import org.jivesoftware.smack.packet.IQ;
-
 /**
  * The FirstName IQ is used to store the user name to the server
  * Created by Vincent Tromeur on 04/12/15.
  */
-public class FirstNameIQ extends IQ {
+public class FirstNameIQ  {
 
     private String mFirstName;
 
     public FirstNameIQ(String firstName) {
         mFirstName = firstName;
-        setType(Type.SET);
+        //setType(Type.SET);
     }
 
-    @Override
     public String getChildElementXML() {
         return "<query xmlns=\"urn:xmpp:firstnameiq\"><firstname>" + mFirstName + "</firstname></query>";
     }
+
 
 }

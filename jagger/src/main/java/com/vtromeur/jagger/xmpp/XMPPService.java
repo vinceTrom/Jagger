@@ -1,26 +1,25 @@
 package com.vtromeur.jagger.xmpp;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
+import com.vtromeur.jagger.MessageDbHelper;
 import com.vtromeur.jagger.xmpp.listeners.ConnectionStateListener;
 import com.vtromeur.jagger.xmpp.listeners.MessageSendingListener;
 import com.vtromeur.jagger.xmpp.listeners.XMPPAccountCreationListener;
 import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 import com.vtromeur.jagger.xmpp.tasks.ConnectAndLoginTask;
 import com.vtromeur.jagger.xmpp.tasks.CreateAccountTask;
-import com.vtromeur.jagger.xmpp.tasks.SendMessageTask;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.SmackAndroid;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.chat.Chat;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
-import java.io.File;
+import java.util.HashMap;
 
 
 public class XMPPService {
@@ -31,9 +30,8 @@ public class XMPPService {
     private XMPPServerConfig mServerConfig;
     private Credentials mUserCredentials;
 
-    private SmackAndroid mSmackInstance;
-    private XMPPConnection mConnection;
-    private PacketListener mMessageReceptionListener;
+    private XMPPTCPConnection mConnection;
+    private HashMap<String, Chat> mChatMap = new HashMap<>();
     private XMPPOnMessageReceivedListener mMessageReceiverlistener;
 
 
@@ -47,43 +45,24 @@ public class XMPPService {
     }
 
     public void init(Context ctx, XMPPServerConfig pServerConfig) {
-        mSmackInstance = SmackAndroid.init(ctx);
-
         // Create a connection
-        ConnectionConfiguration connConfig = createConnectionConfiguration(pServerConfig);
-        mConnection = new XMPPConnection(connConfig);
+        XMPPTCPConnectionConfiguration connConfig = createConnectionConfiguration(pServerConfig);
+        mConnection = new XMPPTCPConnection(connConfig);
     }
 
-    private ConnectionConfiguration createConnectionConfiguration(XMPPServerConfig pServerConfig) {
+    private XMPPTCPConnectionConfiguration createConnectionConfiguration(XMPPServerConfig pServerConfig) {
         mServerConfig = pServerConfig;
 
-        ConnectionConfiguration connConfig = new ConnectionConfiguration(pServerConfig.getHost(), Integer.parseInt(pServerConfig.getPort()));
+        XMPPTCPConnectionConfiguration.Builder connecConfigBuilder = XMPPTCPConnectionConfiguration.builder();
+        connecConfigBuilder.setHost(pServerConfig.getHost());
+        connecConfigBuilder.setPort(Integer.valueOf(pServerConfig.getPort()));
+        connecConfigBuilder.setServiceName(pServerConfig.getHost());
 
-        if (pServerConfig.isSASLAuthenticationEnabled()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-                connConfig.setTruststoreType("AndroidCAStore");
-                connConfig.setTruststorePassword(null);
-                connConfig.setTruststorePath(null);
-            } else {
-                connConfig.setTruststoreType("BKS");
-                String path = System.getProperty("javax.net.ssl.trustStore");
-                if (path == null)
-                    path = System.getProperty("java.home") + File.separator + "etc"
-                            + File.separator + "security" + File.separator
-                            + "cacerts.bks";
-                connConfig.setTruststorePath(path);
-            }
-            connConfig.setSASLAuthenticationEnabled(true);
-        }
-        return connConfig;
+        XMPPTCPConnectionConfiguration connecConfig = connecConfigBuilder.build();
+        return connecConfig;
     }
 
     public void disconnect() {
-        try {
-            mSmackInstance.onDestroy();
-        } catch (Exception e) {
-        }
-
         new Thread(new Runnable() {
 
             @Override
@@ -137,23 +116,28 @@ public class XMPPService {
 
             @Override
             public void connectedAndLogged() {
-                if (mMessageReceiverlistener != null) {
-                    setMessageReceiver(mMessageReceiverlistener);
-                }
                 connectionListener.connectedAndLogged();
             }
         }).execute();
     }
 
 
-    public void setMessageReceiver(final XMPPOnMessageReceivedListener listener) {
+    public void setMessageReceiver(String pChatterName, final XMPPOnMessageReceivedListener listener) {
         mMessageReceiverlistener = listener;
-        if (mMessageReceptionListener != null) {
-            mConnection.removePacketListener(mMessageReceptionListener);
-        }
-        PacketFilter filter = new MessageTypeFilter(Message.Type.chat);
-        mMessageReceptionListener = new MessageReceptionListener(mMessageReceiverlistener);
-        mConnection.addPacketListener(mMessageReceptionListener, filter);
+
+        ChatMessageListener messageListener = new ChatMessageListener() {
+            @Override
+            public void processMessage(Chat chat, Message message) {
+                if(message.getBody() == null){
+                    return;
+                }
+                XMPPMessage xmppMessage = new XMPPMessage(message.getFrom(), message.getTo(), message.getBody(), System.currentTimeMillis(), true);
+                mMessageReceiverlistener.messageReceived(xmppMessage);
+                MessageDbHelper.saveMessageInDB(xmppMessage);
+            }
+        };
+        Chat chat = ChatManager.getInstanceFor(mConnection).createChat(pChatterName+"@"+mServerConfig.getUsernameSuffix(), messageListener);
+        mChatMap.put(pChatterName, chat);
     }
 
     public void sendMessage(String pChatterName, String pMessage, final MessageSendingListener callback) {
@@ -168,12 +152,16 @@ public class XMPPService {
             chatterName = chatterName + "@" + mServerConfig.getUsernameSuffix();
         }
 
+        Chat chat = mChatMap.get(pChatterName);
         XMPPMessage xMPPMessage = new XMPPMessage(userName, chatterName, pMessage, System.currentTimeMillis(), false);
-        sendMessage(xMPPMessage, callback);
-    }
-
-    public void sendMessage(XMPPMessage pXMPPMessage, final MessageSendingListener callback) {
-        new SendMessageTask(mConnection, pXMPPMessage, callback).execute();
+        try {
+            chat.sendMessage(xMPPMessage.getMessage());
+            MessageDbHelper.saveMessageInDB(xMPPMessage);
+            callback.messageSent(xMPPMessage);
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+            callback.messageNotSent(xMPPMessage);
+        }
     }
 
     public boolean isConnected() {

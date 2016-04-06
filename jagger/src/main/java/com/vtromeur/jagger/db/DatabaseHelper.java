@@ -1,4 +1,4 @@
-package com.vtromeur.jagger;
+package com.vtromeur.jagger.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
