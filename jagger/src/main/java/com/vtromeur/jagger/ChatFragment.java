@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -11,12 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.vtromeur.jagger.db.DatabaseHelper;
 import com.vtromeur.jagger.di.DaggerSingleton;
+import com.vtromeur.jagger.ui.MessageAdapter;
 import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
@@ -54,7 +55,7 @@ public class ChatFragment extends Fragment {
     @Inject
     public XMPPService mXmppService;
 
-    private ArrayList<XMPPMessage> mMessages = new ArrayList<>();
+    private List<XMPPMessage> mMessages = new ArrayList<>();
 
     private String mUserName;
     private String mPassword;
@@ -66,8 +67,7 @@ public class ChatFragment extends Fragment {
     private ViewGroup mVg;
     private EditText mEditText;
     private View mSendBtn;
-    private ScrollView mScrollView;
-    private LinearLayout mMessageListView;
+    private RecyclerView mMessageRecyclerView;
 
     private Handler mHandler = new Handler();
 
@@ -114,7 +114,7 @@ public class ChatFragment extends Fragment {
         mVg = (ViewGroup) inflater.inflate(R.layout.fragment_chat, container, false);
 
         initViews(mVg);
-        initViewsListeners(mVg);
+        initViewsListeners();
         applyViewCustomization(mVg);
 
         initXMPPService();
@@ -150,8 +150,6 @@ public class ChatFragment extends Fragment {
     private void initXMPPService() {
         mServerConfig.setSASLAuthenticationEnabled(true);
 
-        // mXmppService = XMPPService.getInstance();
-
         mXmppService.init(getActivity(), mServerConfig);
 
         mXmppService.connect(mUserName, mPassword, new ConnectionStateListener() {
@@ -184,15 +182,15 @@ public class ChatFragment extends Fragment {
                         Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
 
                         mMessages.add(message);
-                        addMessageToScrollView(message);
-                        scrollDown();
+                        scrollDown(true);
                     }
                 });
 
             }
         });
-
-        addMessageListToScrollView(MessageDbHelper.getLastMessages(mUserName, mChatterName));
+        mMessages = MessageDbHelper.getLastMessages(mUserName, mChatterName);
+        addMessageListToScrollView(mMessages);
+        scrollDown(false);
     }
 
 
@@ -200,13 +198,14 @@ public class ChatFragment extends Fragment {
     private void initViews(ViewGroup vg) {
         mSendBtn = vg.findViewById(R.id.sendbtn);
         mEditText = (EditText) vg.findViewById(R.id.editText);
-        mScrollView = (ScrollView) vg.findViewById(R.id.scrollView);
-        mMessageListView = (LinearLayout) vg.findViewById(R.id.messagelistview);
+        mMessageRecyclerView = (RecyclerView) vg.findViewById(R.id.messagerecyclerview);
 
+        LinearLayoutManager layoutManager = new LinearLayoutManager(vg.getContext());
+        mMessageRecyclerView.setLayoutManager(layoutManager);
     }
 
 
-    private void initViewsListeners(ViewGroup vg) {
+    private void initViewsListeners() {
         mSendBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -219,7 +218,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                scrollDown();
+                scrollDown(true);
             }
         });
 
@@ -265,9 +264,8 @@ public class ChatFragment extends Fragment {
 
                     mEditText.setText("");
                     mMessages.add(pMessage);
-                    addMessageToScrollView(pMessage);
-                    scrollDown();
 
+                    scrollDown(true);
                 }
             }
 
@@ -284,38 +282,23 @@ public class ChatFragment extends Fragment {
     private void addMessageListToScrollView(List<XMPPMessage> messages) {
         if (messages == null)
             return;
-        for (int i = 0; i < messages.size(); i++) {
-            addMessageToScrollView(messages.get(i));
-        }
-        scrollDown();
+        mMessageRecyclerView.setAdapter(new MessageAdapter(mMessages, mUICustomization));
     }
 
-    private void addMessageToScrollView(XMPPMessage message) {
 
-        ViewGroup vg = UIHelper.buildMessageView(mMessageListView.getContext(), message, mMessageListView, mUICustomization);
- /*
-        String url = mUser.getPicUrl();
-
-        Datas.loadImage(mMessageListView.getContext(), url, new DataCallback<Bitmap>() {
-            @Override
-            public void dataLoaded(Bitmap img) {
-                if(img != null)
-                    picV.setImage(img);
-            }
-        });
-        */
-        mMessageListView.addView(vg);
-
-    }
-
-    private void scrollDown() {
+    private void scrollDown(final boolean pSmoothly) {
+        mMessageRecyclerView.getAdapter().notifyItemRangeInserted(mMessageRecyclerView.getAdapter().getItemCount(), 1);
         mHandler.postDelayed(new Runnable() {
 
             @Override
             public void run() {
-                mScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                if(pSmoothly) {
+                    mMessageRecyclerView.smoothScrollToPosition(mMessages.size() - 1);
+                }else{
+                    mMessageRecyclerView.scrollToPosition(mMessages.size() - 1);
+                }
             }
-        }, 200);
+        }, pSmoothly? 200 : 0);
     }
 
     public void hideSoftKeyboard() {

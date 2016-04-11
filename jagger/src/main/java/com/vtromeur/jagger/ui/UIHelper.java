@@ -1,21 +1,14 @@
 package com.vtromeur.jagger.ui;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Build;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.vtromeur.jagger.R;
 import com.vtromeur.jagger.UICustomization;
-import com.vtromeur.jagger.Utils;
-import com.vtromeur.jagger.xmpp.XMPPMessage;
 
 import static com.vtromeur.jagger.UICustomization.UNDEFINED_COLOR;
 
@@ -24,46 +17,9 @@ import static com.vtromeur.jagger.UICustomization.UNDEFINED_COLOR;
  */
 public class UIHelper {
 
-    public static ViewGroup buildMessageView(Context pCtx, XMPPMessage pMessage, ViewGroup pViewContainer, UICustomization pCustomization){
-
-        boolean isMessageReceived = pMessage.isReceived();
-
-        Resources res = pCtx.getResources();
-
-        ViewGroup vg = (ViewGroup) LayoutInflater.from(pCtx).inflate(R.layout.chat_message, pViewContainer, false);
-        TextView messV = (TextView) vg.findViewById(R.id.message);
-        TextView timeV = (TextView) vg.findViewById(R.id.timeStamp);
-        final View picV = vg.findViewById(R.id.pic);
-
-        FrameLayout.LayoutParams picflp = (FrameLayout.LayoutParams) picV.getLayoutParams();
-        picflp.gravity = Gravity.BOTTOM | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
-
-
-        messV.setMaxWidth((int) (Utils.getScreenWidth() * 0.8f));
-
-        messV.setText(pMessage.getMessage());
-        FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) messV.getLayoutParams();
-        flp.gravity = isMessageReceived ? Gravity.LEFT : Gravity.RIGHT;
-        int bottomMarginForMess = res.getDimensionPixelOffset(R.dimen.chat_space_for_picandtime);
-        flp.setMargins(flp.leftMargin, flp.topMargin, flp.rightMargin, bottomMarginForMess);
-
-
-        timeV.setMaxWidth((int) (Utils.getScreenWidth() * 0.7f));
-        timeV.setText(XMPPMessage.getDateString(pMessage.getDate()));
-        int margin = res.getDimensionPixelSize(R.dimen.chat_time_horizontal_margin);
-        FrameLayout.LayoutParams flp2 = (FrameLayout.LayoutParams) timeV.getLayoutParams();
-        flp2.gravity = flp2.gravity | (isMessageReceived ? Gravity.LEFT : Gravity.RIGHT);
-        int bottomMarginForTimeStamp = res.getDimensionPixelOffset(R.dimen.chat_timestampbottom_for_picandtime);
-        flp2.setMargins(isMessageReceived ? margin : 0, flp2.topMargin, isMessageReceived ? 0 : margin, bottomMarginForTimeStamp);
-
-        applyMessageViewCustomization(messV, pCustomization, isMessageReceived);
-
-        return vg;
-    }
-
-    private static void applyMessageViewCustomization(View pMessV, UICustomization pCustomization, boolean pIsMessageReceived){
+    public static void applyMessageViewCustomization(View pMessV, UICustomization pCustomization, boolean pIsMessageReceived){
         Resources res = pMessV.getResources();
-        
+
         NinePatchDrawable bubble = (NinePatchDrawable) res.getDrawable(pIsMessageReceived ? R.drawable.chat_bubble_left : R.drawable.chat_bubble_right);
         int backColor = getMessageBackgroundColor(res, pCustomization, pIsMessageReceived);
         if(Build.VERSION.SDK_INT >= 21) {
