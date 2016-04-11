@@ -16,6 +16,7 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.vtromeur.jagger.db.DatabaseHelper;
+import com.vtromeur.jagger.di.DaggerSingleton;
 import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
@@ -26,6 +27,8 @@ import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 /**
@@ -48,7 +51,8 @@ public class ChatFragment extends Fragment {
 
     private UICustomization mUICustomization = new UICustomization();
 
-    private XMPPService mXmppService;
+    @Inject
+    public XMPPService mXmppService;
 
     private ArrayList<XMPPMessage> mMessages = new ArrayList<>();
 
@@ -66,6 +70,10 @@ public class ChatFragment extends Fragment {
     private LinearLayout mMessageListView;
 
     private Handler mHandler = new Handler();
+
+    public ChatFragment(){
+        DaggerSingleton.getInstance().daggerComponent().inject(this);
+    }
 
     /**
      * Return an instance of ChatFragment, initialized with the two users ids
@@ -142,7 +150,7 @@ public class ChatFragment extends Fragment {
     private void initXMPPService() {
         mServerConfig.setSASLAuthenticationEnabled(true);
 
-        mXmppService = XMPPService.getInstance();
+        // mXmppService = XMPPService.getInstance();
 
         mXmppService.init(getActivity(), mServerConfig);
 

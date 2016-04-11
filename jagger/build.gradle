@@ -1,8 +1,10 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 16
@@ -25,5 +27,9 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'org.igniterealtime.smack:smack-android:4.1.0-rc1'
     compile 'org.igniterealtime.smack:smack-tcp:4.1.0-rc1'
-    //compile files('libs/asmack-android-17-0.8.3.jar')
+
+    compile 'com.google.dagger:dagger:2.0.1'
+    apt 'com.google.dagger:dagger-compiler:2.0.1' //apt utilisera dagger-compiler
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+
 }

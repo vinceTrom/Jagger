@@ -35,14 +35,9 @@ public class XMPPService {
     private XMPPOnMessageReceivedListener mMessageReceiverlistener;
 
 
-    private XMPPService() {
+    public XMPPService() {
     }
 
-    public static XMPPService getInstance() {
-        if (sService == null)
-            sService = new XMPPService();
-        return sService;
-    }
 
     public void init(Context ctx, XMPPServerConfig pServerConfig) {
         // Create a connection
