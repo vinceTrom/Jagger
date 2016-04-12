@@ -151,7 +151,7 @@ public class ChatFragment extends Fragment {
     private void initXMPPService() {
         mServerConfig.setSASLAuthenticationEnabled(true);
 
-        mXmppService.init(getActivity(), mServerConfig);
+        mXmppService.init(mServerConfig);
 
         mXmppService.connect(mUserName, mPassword, new ConnectionStateListener() {
 

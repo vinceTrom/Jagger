@@ -1,6 +1,5 @@
 package com.vtromeur.jagger.xmpp;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.vtromeur.jagger.MessageDbHelper;
@@ -24,9 +23,6 @@ import java.util.HashMap;
 
 public class XMPPService {
 
-
-    private static XMPPService sService;
-
     private XMPPServerConfig mServerConfig;
     private Credentials mUserCredentials;
 
@@ -39,7 +35,7 @@ public class XMPPService {
     }
 
 
-    public void init(Context ctx, XMPPServerConfig pServerConfig) {
+    public void init(XMPPServerConfig pServerConfig) {
         // Create a connection
         XMPPTCPConnectionConfiguration connConfig = createConnectionConfiguration(pServerConfig);
         mConnection = new XMPPTCPConnection(connConfig);
@@ -53,8 +49,7 @@ public class XMPPService {
         connecConfigBuilder.setPort(Integer.valueOf(pServerConfig.getPort()));
         connecConfigBuilder.setServiceName(pServerConfig.getHost());
 
-        XMPPTCPConnectionConfiguration connecConfig = connecConfigBuilder.build();
-        return connecConfig;
+        return connecConfigBuilder.build();
     }
 
     public void disconnect() {
@@ -158,15 +153,6 @@ public class XMPPService {
             callback.messageNotSent(xMPPMessage);
         }
     }
-
-    public boolean isConnected() {
-        return mConnection != null && mConnection.isConnected();
-    }
-
-    public boolean isAuthenticated() {
-        return mConnection != null && mConnection.isAuthenticated();
-    }
-
 }
 
 
