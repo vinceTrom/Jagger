@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.vtromeur.jagger.db.DatabaseHelper;
 import com.vtromeur.jagger.di.DaggerSingleton;
+import com.vtromeur.jagger.ui.CustomRecyclerViewLayoutManager;
 import com.vtromeur.jagger.ui.MessageAdapter;
 import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
@@ -200,7 +201,7 @@ public class ChatFragment extends Fragment {
         mEditText = (EditText) vg.findViewById(R.id.editText);
         mMessageRecyclerView = (RecyclerView) vg.findViewById(R.id.messagerecyclerview);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(vg.getContext());
+        LinearLayoutManager layoutManager = new CustomRecyclerViewLayoutManager(vg.getContext());
         mMessageRecyclerView.setLayoutManager(layoutManager);
     }
 
@@ -287,7 +288,7 @@ public class ChatFragment extends Fragment {
 
 
     private void scrollDown(final boolean pSmoothly) {
-        mMessageRecyclerView.getAdapter().notifyItemRangeInserted(mMessageRecyclerView.getAdapter().getItemCount(), 1);
+        mMessageRecyclerView.getAdapter().notifyItemInserted(mMessageRecyclerView.getAdapter().getItemCount());
         mHandler.postDelayed(new Runnable() {
 
             @Override
