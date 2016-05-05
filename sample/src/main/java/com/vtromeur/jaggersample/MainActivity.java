@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.vtromeur.jagger.ChatFragment;
 import com.vtromeur.jagger.UICustomization;
+import com.vtromeur.jagger.di.DaggerSingleton;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         launchCredentialsFragment();
+
+        DaggerSingleton.initInstance(getBaseContext());
     }
 
     private void launchCredentialsFragment(){

@@ -1,7 +1,6 @@
 package com.vtromeur.jagger.di;
 
-import com.vtromeur.jagger.ChatFragment;
-import com.vtromeur.jagger.xmpp.XMPPService;
+import com.vtromeur.jagger.ChatPresenter;
 
 import javax.inject.Singleton;
 
@@ -14,6 +13,5 @@ import dagger.Component;
 @Component(modules = DaggerXMPPModule.class)
 public interface MyDaggerComponent {
 
-    XMPPService xmppService();
-    void inject(ChatFragment pChatFragment);
+    void inject(ChatPresenter pChatPresenter);
 }

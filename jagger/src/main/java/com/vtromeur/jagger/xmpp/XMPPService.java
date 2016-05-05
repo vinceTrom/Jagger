@@ -2,7 +2,6 @@ package com.vtromeur.jagger.xmpp;
 
 import android.util.Log;
 
-import com.vtromeur.jagger.MessageDbHelper;
 import com.vtromeur.jagger.xmpp.listeners.ConnectionStateListener;
 import com.vtromeur.jagger.xmpp.listeners.MessageSendingListener;
 import com.vtromeur.jagger.xmpp.listeners.XMPPAccountCreationListener;
@@ -123,7 +122,6 @@ public class XMPPService {
                 }
                 XMPPMessage xmppMessage = new XMPPMessage(message.getFrom(), message.getTo(), message.getBody(), System.currentTimeMillis(), true);
                 mMessageReceiverlistener.messageReceived(xmppMessage);
-                MessageDbHelper.saveMessageInDB(xmppMessage);
             }
         };
         Chat chat = ChatManager.getInstanceFor(mConnection).createChat(pChatterName+"@"+mServerConfig.getUsernameSuffix(), messageListener);
@@ -146,7 +144,6 @@ public class XMPPService {
         XMPPMessage xMPPMessage = new XMPPMessage(userName, chatterName, pMessage, System.currentTimeMillis(), false);
         try {
             chat.sendMessage(xMPPMessage.getMessage());
-            MessageDbHelper.saveMessageInDB(xMPPMessage);
             callback.messageSent(xMPPMessage);
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();

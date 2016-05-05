@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class MessageDbHelper {
 
-    public static boolean saveMessageInDB(XMPPMessage pMessage) {
+    public boolean saveMessageInDB(XMPPMessage pMessage) {
         try {
             DatabaseHelper.getHelper().getMessageDao().create(parseBareID(pMessage));
             Log.e("aa", "mess sender:"+parseBareID(pMessage).getSenderId());
@@ -29,7 +29,7 @@ public class MessageDbHelper {
         }
     }
 
-    public static List<XMPPMessage> getLastMessages(String pUserId, String pChatterId){
+    public List<XMPPMessage> getLastMessages(String pUserId, String pChatterId){
         try {
             Dao<XMPPMessage, Integer> messageDao = DatabaseHelper.getHelper().getMessageDao();
 

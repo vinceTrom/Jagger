@@ -15,22 +15,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.vtromeur.jagger.db.DatabaseHelper;
-import com.vtromeur.jagger.di.DaggerSingleton;
 import com.vtromeur.jagger.ui.CustomRecyclerViewLayoutManager;
 import com.vtromeur.jagger.ui.MessageAdapter;
 import com.vtromeur.jagger.ui.UIHelper;
 import com.vtromeur.jagger.xmpp.XMPPMessage;
 import com.vtromeur.jagger.xmpp.XMPPServerConfig;
-import com.vtromeur.jagger.xmpp.XMPPService;
-import com.vtromeur.jagger.xmpp.listeners.ConnectionStateListener;
-import com.vtromeur.jagger.xmpp.listeners.MessageSendingListener;
-import com.vtromeur.jagger.xmpp.listeners.XMPPOnMessageReceivedListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 
 /**
@@ -45,25 +37,11 @@ import javax.inject.Inject;
 
 public class ChatFragment extends Fragment {
 
-    private static final String USERNAME_KEY = "USERNAME_KEY";
-    private static final String PASSWORD_KEY = "PASSWORD_KEY";
-    private static final String CHATTERNAME_KEY = "CHATTERNAME_KEY";
-    private static final String SERVER_CONFIG_KEY = "SERVER_CONFIG_KEY";
-
+    private ChatPresenter mPresenter;
 
     private UICustomization mUICustomization = new UICustomization();
 
-    @Inject
-    public XMPPService mXmppService;
-
     private List<XMPPMessage> mMessages = new ArrayList<>();
-
-    private String mUserName;
-    private String mPassword;
-    private String mChatterName;
-
-    private XMPPServerConfig mServerConfig;
-
 
     private ViewGroup mVg;
     private EditText mEditText;
@@ -73,7 +51,11 @@ public class ChatFragment extends Fragment {
     private Handler mHandler = new Handler();
 
     public ChatFragment(){
-        DaggerSingleton.getInstance().daggerComponent().inject(this);
+        mPresenter = new ChatPresenter(this);
+    }
+
+    private void initPresenter(XMPPServerConfig pServerConfig, String pUserName, String pPassword, String pChatterName){
+        mPresenter.initChatParams(pServerConfig, pUserName, pPassword, pChatterName);
     }
 
     /**
@@ -84,12 +66,7 @@ public class ChatFragment extends Fragment {
      */
     public static ChatFragment getInstance(XMPPServerConfig pServerConfig, String pUserName, String pPassword, String pChatterName) {
         ChatFragment chatFrag = new ChatFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString(USERNAME_KEY, pUserName);
-        bundle.putString(PASSWORD_KEY, pPassword);
-        bundle.putString(CHATTERNAME_KEY, pChatterName);
-        bundle.putSerializable(SERVER_CONFIG_KEY, pServerConfig);
-        chatFrag.setArguments(bundle);
+        chatFrag.initPresenter(pServerConfig, pUserName, pPassword, pChatterName);
         return chatFrag;
     }
 
@@ -105,20 +82,13 @@ public class ChatFragment extends Fragment {
 
         Utils.initScreenWidth(container.getContext());
 
-        DatabaseHelper.init(getActivity());
-
-        mUserName = getArguments().getString(USERNAME_KEY);
-        mPassword = getArguments().getString(PASSWORD_KEY);
-        mChatterName = getArguments().getString(CHATTERNAME_KEY);
-
-        mServerConfig = (XMPPServerConfig) getArguments().getSerializable(SERVER_CONFIG_KEY);
         mVg = (ViewGroup) inflater.inflate(R.layout.fragment_chat, container, false);
 
         initViews(mVg);
         initViewsListeners();
         applyViewCustomization(mVg);
 
-        initXMPPService();
+        mPresenter.viewCreated();
 
         return mVg;
     }
@@ -128,15 +98,14 @@ public class ChatFragment extends Fragment {
         pView.setBackgroundColor(color);
     }
 
-    private void removeLoaderView() {
+    public void removeLoaderView() {
         //mVg.removeView(mVg.findViewById(R.id.loaderView));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mXmppService != null)
-            mXmppService.setMessageReceiver(mChatterName, null);
+        mPresenter.viewStopped();
         if (getActivity() != null) {
             hideSoftKeyboard();
         }
@@ -145,55 +114,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onDestroyView (){
         super.onDestroyView();
-        mXmppService.disconnect();
+        mPresenter.viewDestroyed();
     }
-
-    private void initXMPPService() {
-        mServerConfig.setSASLAuthenticationEnabled(true);
-
-        mXmppService.init(mServerConfig);
-
-        mXmppService.connect(mUserName, mPassword, new ConnectionStateListener() {
-
-            @Override
-            public void loggingFailed() {
-                Toast.makeText(getActivity(), R.string.logging_failed, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void connectionFailed() {
-                removeLoaderView();
-                if (getActivity() != null)
-                    Toast.makeText(getActivity(), R.string.connection_failed, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void connectedAndLogged() {
-                removeLoaderView();
-                Toast.makeText(getActivity(), R.string.connection_and_logged, Toast.LENGTH_SHORT).show();
-            }
-        });
-        mXmppService.setMessageReceiver(mChatterName, new XMPPOnMessageReceivedListener() {
-
-            @Override
-            public void messageReceived(final XMPPMessage message) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity(), getString(R.string.message_received) + message.getMessage(), Toast.LENGTH_SHORT).show();
-
-                        mMessages.add(message);
-                        scrollDown(true);
-                    }
-                });
-
-            }
-        });
-        mMessages = MessageDbHelper.getLastMessages(mUserName, mChatterName);
-        addMessageListToScrollView(mMessages);
-        scrollDown(false);
-    }
-
 
 
     private void initViews(ViewGroup vg) {
@@ -212,14 +134,14 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String message = mEditText.getText().toString();
-                sendMessage(message);
+                mPresenter.sendMessage(message);
             }
         });
         mEditText.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                scrollDown(true);
+                scrollDownMessageListView(true);
             }
         });
 
@@ -246,49 +168,53 @@ public class ChatFragment extends Fragment {
 
     }
 
-    private void sendMessage(final String message) {
-        if (message.length() == 0)
-            return;
-
-        mVg.findViewById(R.id.sendloading).setVisibility(View.VISIBLE);
-        mVg.findViewById(R.id.sendbtn).setVisibility(View.GONE);
 
 
-        mXmppService.sendMessage(mChatterName, message, new MessageSendingListener() {
 
-            @Override
-            public void messageSent(XMPPMessage pMessage) {
-                Toast.makeText(getActivity(), R.string.message_sent, Toast.LENGTH_SHORT).show();
-                if (getActivity() != null) {
-                    mVg.findViewById(R.id.sendloading).setVisibility(View.GONE);
-                    mVg.findViewById(R.id.sendbtn).setVisibility(View.VISIBLE);
-
-                    mEditText.setText("");
-                    mMessages.add(pMessage);
-
-                    scrollDown(true);
-                }
-            }
-
-            @Override
-            public void messageNotSent(XMPPMessage pMessage) {
-                if (getActivity() != null) {
-                    Toast.makeText(getActivity(), R.string.message_not_sent, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-
-    private void addMessageListToScrollView(List<XMPPMessage> messages) {
-        if (messages == null)
-            return;
+    public void setMessageList(List<XMPPMessage> messages) {
+        mMessages = messages;
         mMessageRecyclerView.setAdapter(new MessageAdapter(mMessages, mUICustomization));
     }
 
+    public void addMessage(XMPPMessage pMessage){
+        mMessages.add(pMessage);
+    }
 
-    private void scrollDown(final boolean pSmoothly) {
-        mMessageRecyclerView.getAdapter().notifyItemInserted(mMessageRecyclerView.getAdapter().getItemCount());
+    public void showToastMessage(String pMessage){
+        if(getActivity() != null) {
+            Toast.makeText(getActivity(), pMessage, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void showSendButton(){
+        mVg.findViewById(R.id.sendbtn).setVisibility(View.VISIBLE);
+    }
+
+    public void hideSendButton(){
+        mVg.findViewById(R.id.sendbtn).setVisibility(View.GONE);
+    }
+
+    public void showMessageSendingLoader(){
+        mVg.findViewById(R.id.sendloading).setVisibility(View.VISIBLE);
+    }
+
+    public void hideMessageSendingLoader(){
+        mVg.findViewById(R.id.sendloading).setVisibility(View.GONE);
+    }
+
+    public void emptyMessageEdit(){
+        mEditText.setText("");
+    }
+
+
+    public void scrollDownMessageListView(final boolean pSmoothly) {
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mMessageRecyclerView.getAdapter().notifyItemInserted(mMessageRecyclerView.getAdapter().getItemCount());
+            }
+        });
         mHandler.postDelayed(new Runnable() {
 
             @Override
