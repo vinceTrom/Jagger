@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class MessageDbHelper {
 
+    private static final long MAX_MESSAGE_READ = 100;
+
     public boolean saveMessageInDB(XMPPMessage pMessage) {
         try {
             DatabaseHelper.getHelper().getMessageDao().create(parseBareID(pMessage));
@@ -33,22 +35,38 @@ public class MessageDbHelper {
         try {
             Dao<XMPPMessage, Integer> messageDao = DatabaseHelper.getHelper().getMessageDao();
 
-            QueryBuilder queryBuilder = messageDao.queryBuilder();
-            Where where = queryBuilder.where();
-            where.eq(XMPPMessage.SENDER_ID, pChatterId)
-                    .and().eq(XMPPMessage.RECEIVER_ID, pUserId);
-            where.eq(XMPPMessage.SENDER_ID, pUserId)
-                    .and().eq(XMPPMessage.RECEIVER_ID, pChatterId);
-            where.or(2);
-            queryBuilder.limit(100L);
-            queryBuilder.orderBy(XMPPMessage.DATE, true);
+            QueryBuilder queryBuilderForList = buildQueryBuilder(messageDao, pUserId, pChatterId);
 
-            PreparedQuery query = queryBuilder.prepare();
+            long messageCountInDb = getMessageCountInDB(messageDao, pUserId, pChatterId);
+            if(messageCountInDb > MAX_MESSAGE_READ){
+                queryBuilderForList.offset(messageCountInDb - MAX_MESSAGE_READ);
+            }
+
+            queryBuilderForList.limit(MAX_MESSAGE_READ);
+            queryBuilderForList.orderBy(XMPPMessage.DATE, true);
+
+            PreparedQuery query = queryBuilderForList.prepare();
             return messageDao.query(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return new ArrayList<>();
+    }
+
+    private long getMessageCountInDB(Dao<XMPPMessage, Integer> messageDao, String pUserId, String pChatterId) throws SQLException {
+        return buildQueryBuilder(messageDao, pUserId, pChatterId).countOf();
+    }
+
+    private QueryBuilder buildQueryBuilder(Dao<XMPPMessage, Integer> messageDao, String pUserId, String pChatterId) throws SQLException {
+        QueryBuilder queryBuilder = messageDao.queryBuilder();
+        Where where = queryBuilder.where();
+        where.eq(XMPPMessage.SENDER_ID, pChatterId)
+                .and().eq(XMPPMessage.RECEIVER_ID, pUserId);
+        where.eq(XMPPMessage.SENDER_ID, pUserId)
+                .and().eq(XMPPMessage.RECEIVER_ID, pChatterId);
+        where.or(2);
+
+        return queryBuilder;
     }
 
     private static XMPPMessage parseBareID(XMPPMessage pMessage){
